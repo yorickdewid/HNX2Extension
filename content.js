@@ -1,3 +1,19 @@
+const CONFIG = {
+  score: {
+    high: 1000,
+    medium: 600,
+    low: 400
+  },
+  comments: {
+    high: 500,
+    medium: 200
+  },
+  colors: {
+    keyword: 'blue',
+    hotPost: 'red'
+  }
+};
+
 function parseTitleLineElement(titlelineElement, onTitleLine) {
   const parentTr = titlelineElement.closest('tr');
 
@@ -42,6 +58,16 @@ function createIcon(iconText) {
   return icon;
 }
 
+function highlightLink(linkA, color, weight = 'normal', decoration = 'none') {
+  linkA.style.color = color;
+  if (weight !== 'normal') linkA.style.fontWeight = weight;
+  if (decoration !== 'none') linkA.style.textDecoration = decoration;
+}
+
+function addIcon(linkA, iconText) {
+  linkA.insertBefore(createIcon(iconText), linkA.firstChild);
+}
+
 var matchKeywords = [];
 var matchUrls = [];
 
@@ -58,52 +84,49 @@ var matchUrls = [];
 const onTitleLine = (titlelineElement, title, url, score, comments) => {
   if (matchKeywords.some(keyword => title.toLowerCase().includes(keyword.toLowerCase()))) {
     const linkA = titlelineElement.querySelector('a');
-    linkA.style.color = 'blue';
+    linkA.style.color = CONFIG.colors.keyword;
   }
 
   if (matchUrls.some(matchUrl => url.match(matchUrl))) {
     const linkA = titlelineElement.querySelector('a');
-    linkA.style.color = 'blue';
+    linkA.style.color = CONFIG.colors.keyword;
   }
 
-  const commentsThresholdHigh = 500;
-  const commentsThresholdMedium = 200;
+  const commentsThresholdHigh = CONFIG.comments.high;
+  const commentsThresholdMedium = CONFIG.comments.medium;
   switch (true) {
     case (comments >= commentsThresholdHigh): {
       const linkA = titlelineElement.querySelector('a');
-      linkA.insertBefore(createIcon('💬💬 '), linkA.firstChild);
+      addIcon(linkA, '💬💬 ');
       break;
     }
     case (comments >= commentsThresholdMedium): {
       const linkA = titlelineElement.querySelector('a');
-      linkA.insertBefore(createIcon('💬 '), linkA.firstChild);
+      addIcon(linkA, '💬 ');
       break;
     }
   }
 
-  const scoreThresholdHigh = 1000;
-  const scoreThresholdMedium = 600;
-  const scoreThresholdLow = 400;
+  const scoreThresholdHigh = CONFIG.score.high;
+  const scoreThresholdMedium = CONFIG.score.medium;
+  const scoreThresholdLow = CONFIG.score.low;
   switch (true) {
     case (score >= scoreThresholdHigh): {
       const linkA = titlelineElement.querySelector('a');
-      linkA.style.color = 'red';
-      linkA.style.fontWeight = 'bold';
-      linkA.style.textDecoration = 'underline';
-      linkA.insertBefore(createIcon('🔥🔥🔥 '), linkA.firstChild);
+      highlightLink(linkA, CONFIG.colors.hotPost, 'bold', 'underline');
+      addIcon(linkA, '🔥🔥🔥 ');
       break;
     }
     case (score >= scoreThresholdMedium): {
       const linkA = titlelineElement.querySelector('a');
-      linkA.style.color = 'red';
-      linkA.style.fontWeight = 'bold';
-      linkA.insertBefore(createIcon('🔥🔥 '), linkA.firstChild);
+      highlightLink(linkA, CONFIG.colors.hotPost, 'bold');
+      addIcon(linkA, '🔥🔥 ');
       break;
     }
     case (score >= scoreThresholdLow): {
       const linkA = titlelineElement.querySelector('a');
-      linkA.style.color = 'red';
-      linkA.insertBefore(createIcon('🔥 '), linkA.firstChild);
+      highlightLink(linkA, CONFIG.colors.hotPost);
+      addIcon(linkA, '🔥 ');
       break;
     }
   }
