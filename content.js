@@ -14,6 +14,9 @@ const CONFIG = {
   }
 };
 
+const MAX_KEYWORDS = 100;
+const MAX_URLS = 100;
+
 function parseTitleLineElement(titlelineElement, onTitleLine) {
   try {
     const parentTr = titlelineElement.closest('tr');
@@ -136,12 +139,28 @@ const onTitleLine = (titlelineElement, title, url, score, comments) => {
   }
 }
 
-// TOOD: Limit the number or keywords and urls that can be stored.
 chrome.storage.sync.get(['keywords', 'urls'], function (result) {
-  matchKeywords = result.keywords || [];
-  matchUrls = result.urls || [];
+  matchKeywords = (result.keywords || []).slice(0, MAX_KEYWORDS);
+  matchUrls = (result.urls || []).slice(0, MAX_URLS);
 
   document.querySelectorAll('.titleline').forEach(titlelineElement => {
     parseTitleLineElement(titlelineElement, onTitleLine);
   });
 });
+
+const observer = new MutationObserver(mutations => {
+  mutations.forEach(mutation => {
+    mutation.addedNodes.forEach(node => {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const titlelines = node.classList?.contains('titleline') ?
+          [node] : Array.from(node.querySelectorAll('.titleline'));
+
+        titlelines.forEach(titleline => {
+          parseTitleLineElement(titleline, onTitleLine);
+        });
+      }
+    });
+  });
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
