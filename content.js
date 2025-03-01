@@ -15,35 +15,39 @@ const CONFIG = {
 };
 
 function parseTitleLineElement(titlelineElement, onTitleLine) {
-  const parentTr = titlelineElement.closest('tr');
+  try {
+    const parentTr = titlelineElement.closest('tr');
 
-  const linkA = titlelineElement.querySelector('a');
-  const text = linkA.textContent;
-  const url = linkA.href;
+    const linkA = titlelineElement.querySelector('a');
+    const text = linkA.textContent;
+    const url = linkA.href;
 
-  var score = 0;
-  var comments = 0;
+    var score = 0;
+    var comments = 0;
 
-  const nextTr = parentTr.nextElementSibling;
-  if (nextTr) {
-    const scoreElement = nextTr.querySelector('.score');
+    const nextTr = parentTr.nextElementSibling;
+    if (nextTr) {
+      const scoreElement = nextTr.querySelector('.score');
 
-    if (scoreElement) {
-      const scoreText = scoreElement.textContent;
-      const match = scoreText.match(/(\d+)\spoints/);
-      score = parseInt(match[1], 10);
+      if (scoreElement) {
+        const scoreText = scoreElement.textContent;
+        const match = scoreText.match(/(\d+)\spoints/);
+        score = parseInt(match[1], 10);
+      }
+
+      const aElements = nextTr.querySelectorAll('a');
+      aElements.forEach(a => {
+        if (a.textContent.includes('comments')) {
+          const match = a.textContent.match(/(\d+)\scomments/);
+          comments = parseInt(match[1], 10);
+        }
+      });
     }
 
-    const aElements = nextTr.querySelectorAll('a');
-    aElements.forEach(a => {
-      if (a.textContent.includes('comments')) {
-        const match = a.textContent.match(/(\d+)\scomments/);
-        comments = parseInt(match[1], 10);
-      }
-    });
+    onTitleLine(titlelineElement, text, url, score, comments);
+  } catch (error) {
+    console.error('Error parsing title line:', error, titlelineElement);
   }
-
-  onTitleLine(titlelineElement, text, url, score, comments);
 }
 
 /**
