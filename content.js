@@ -23,7 +23,7 @@ function addStyles() {
 }
 addStyles();
 
-const CONFIG = {
+const DEFAULT_CONFIG = {
   score: {
     high: 1000,
     medium: 600,
@@ -98,6 +98,7 @@ function addIcon(linkA, iconText) {
 
 var matchKeywords = [];
 var matchUrls = [];
+var config = DEFAULT_CONFIG;
 
 /**
  * Callback function for the title line element.
@@ -120,8 +121,8 @@ const onTitleLine = (titlelineElement, title, url, score, comments) => {
     linkA.classList.add('hnx-keyword');
   }
 
-  const commentsThresholdHigh = CONFIG.comments.high;
-  const commentsThresholdMedium = CONFIG.comments.medium;
+  const commentsThresholdHigh = config.comments.high;
+  const commentsThresholdMedium = config.comments.medium;
   switch (true) {
     case (comments >= commentsThresholdHigh): {
       const linkA = titlelineElement.querySelector('a');
@@ -135,9 +136,9 @@ const onTitleLine = (titlelineElement, title, url, score, comments) => {
     }
   }
 
-  const scoreThresholdHigh = CONFIG.score.high;
-  const scoreThresholdMedium = CONFIG.score.medium;
-  const scoreThresholdLow = CONFIG.score.low;
+  const scoreThresholdHigh = config.score.high;
+  const scoreThresholdMedium = config.score.medium;
+  const scoreThresholdLow = config.score.low;
   switch (true) {
     case (score >= scoreThresholdHigh): {
       const linkA = titlelineElement.querySelector('a');
@@ -160,13 +161,61 @@ const onTitleLine = (titlelineElement, title, url, score, comments) => {
   }
 }
 
-chrome.storage.sync.get(['keywords', 'urls'], function (result) {
+chrome.storage.sync.get(['keywords', 'urls', 'score', 'comments'], function (result) {
   matchKeywords = (result.keywords || []).slice(0, MAX_KEYWORDS);
   matchUrls = (result.urls || []).slice(0, MAX_URLS);
+
+  if (result.score) config.score = result.score;
+  if (result.comments) config.comments = result.comments;
 
   document.querySelectorAll('.titleline').forEach(titlelineElement => {
     parseTitleLineElement(titlelineElement, onTitleLine);
   });
+});
+
+chrome.storage.onChanged.addListener((changes) => {
+  let needsRefresh = false;
+
+  if (changes.keywords) {
+    matchKeywords = (changes.keywords.newValue || []).slice(0, MAX_KEYWORDS);
+    needsRefresh = true;
+  }
+
+  if (changes.urls) {
+    matchUrls = (changes.urls.newValue || []).slice(0, MAX_URLS);
+    needsRefresh = true;
+  }
+
+  if (changes.score) {
+    config.score = changes.score.newValue || DEFAULT_CONFIG.score;
+    needsRefresh = true;
+  }
+
+  if (changes.comments) {
+    config.comments = changes.comments.newValue || DEFAULT_CONFIG.comments;
+    needsRefresh = true;
+  }
+
+  if (needsRefresh) {
+    // Re-apply to existing elements
+    document.querySelectorAll('.titleline').forEach(titlelineElement => {
+      // Remove existing classes and icons before reapplying
+      const linkA = titlelineElement.querySelector('a');
+      if (linkA) {
+        linkA.classList.remove('hnx-keyword', 'hnx-hot', 'hnx-very-hot');
+
+        // Remove icons (emoji spans)
+        Array.from(linkA.childNodes).forEach(node => {
+          if (node.nodeType === Node.TEXT_NODE &&
+            (node.textContent.includes('🔥') || node.textContent.includes('💬'))) {
+            linkA.removeChild(node);
+          }
+        });
+      }
+
+      parseTitleLineElement(titlelineElement, onTitleLine);
+    });
+  }
 });
 
 const observer = new MutationObserver(mutations => {

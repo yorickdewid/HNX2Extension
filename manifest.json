@@ -21,6 +21,7 @@
       "48": "images/icon48.png"
     }
   },
+  "options_page": "options.html",
   "content_scripts": [
     {
       "matches": [

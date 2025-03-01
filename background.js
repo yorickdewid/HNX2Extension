@@ -17,3 +17,7 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
     chrome.storage.sync.set(DEFAULT_CONFIG);
   }
 });
+
+chrome.action.onClicked.addListener(() => {
+  chrome.runtime.openOptionsPage();
+});

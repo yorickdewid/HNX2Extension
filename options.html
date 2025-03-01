@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hacker News X2 Options</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      max-width: 800px;
+      line-height: 1.5;
+    }
+    h1 {
+      color: #ff6600;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+    .settings-section {
+      margin-bottom: 30px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      border: 1px solid #ddd;
+      padding: 8px;
+      margin-bottom: 10px;
+      font-family: monospace;
+    }
+    .button-container {
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      background-color: #ff6600;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #e65c00;
+    }
+    .status {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 4px;
+      display: none;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .note {
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hacker News X2 Options</h1>
+  
+  <div class="settings-section">
+    <label for="keywordsTextarea">Keywords</label>
+    <textarea id="keywordsTextarea" placeholder="Enter keywords, one per line"></textarea>
+    <div class="note">Titles containing these keywords will be highlighted</div>
+  </div>
+
+  <div class="settings-section">
+    <label for="urlsTextarea">URL Patterns</label>
+    <textarea id="urlsTextarea" placeholder="Enter URL patterns, one per line (regex supported)"></textarea>
+    <div class="note">You can use regular expressions (regex) to match URL patterns.</div>
+    <div class="note">
+        <strong>Example URL Pattern:</strong>
+        <div>https:\/\/.*\.example\.com</div>
+        <div>This pattern matches any subdomain of example.com.</div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <label for="thresholds">Thresholds</label>
+    <div>
+      <label>Score thresholds: High: 
+        <input type="number" id="scoreHigh" min="0" value="1000">
+      </label>
+      <label>Medium: 
+        <input type="number" id="scoreMedium" min="0" value="600">
+      </label>
+      <label>Low: 
+        <input type="number" id="scoreLow" min="0" value="400">
+      </label>
+    </div>
+    <div>
+      <label>Comments thresholds: High: 
+        <input type="number" id="commentsHigh" min="0" value="500">
+      </label>
+      <label>Medium: 
+        <input type="number" id="commentsMedium" min="0" value="200">
+      </label>
+    </div>
+  </div>
+
+  <div class="button-container">
+    <button id="saveBtn">Save</button>
+    <button id="resetBtn">Reset to Defaults</button>
+  </div>
+
+  <div id="status" class="status"></div>
+
+  <script src="options.js"></script>
+</body>
+</html>
