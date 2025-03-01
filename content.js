@@ -1,3 +1,28 @@
+function addStyles() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .titleline a.hnx-keyword, 
+    a.hnx-keyword { 
+      color: blue !important; 
+    }
+    
+    .titleline a.hnx-hot, 
+    a.hnx-hot { 
+      color: red !important; 
+      font-weight: bold !important; 
+    }
+    
+    .titleline a.hnx-very-hot, 
+    a.hnx-very-hot { 
+      color: red !important; 
+      font-weight: bold !important; 
+      text-decoration: underline !important; 
+    }
+  `;
+  document.head.appendChild(style);
+}
+addStyles();
+
 const CONFIG = {
   score: {
     high: 1000,
@@ -7,10 +32,6 @@ const CONFIG = {
   comments: {
     high: 500,
     medium: 200
-  },
-  colors: {
-    keyword: 'blue',
-    hotPost: 'red'
   }
 };
 
@@ -91,12 +112,12 @@ var matchUrls = [];
 const onTitleLine = (titlelineElement, title, url, score, comments) => {
   if (matchKeywords.some(keyword => title.toLowerCase().includes(keyword.toLowerCase()))) {
     const linkA = titlelineElement.querySelector('a');
-    linkA.style.color = CONFIG.colors.keyword;
+    linkA.classList.add('hnx-keyword');
   }
 
   if (matchUrls.some(matchUrl => url.match(matchUrl))) {
     const linkA = titlelineElement.querySelector('a');
-    linkA.style.color = CONFIG.colors.keyword;
+    linkA.classList.add('hnx-keyword');
   }
 
   const commentsThresholdHigh = CONFIG.comments.high;
@@ -120,19 +141,19 @@ const onTitleLine = (titlelineElement, title, url, score, comments) => {
   switch (true) {
     case (score >= scoreThresholdHigh): {
       const linkA = titlelineElement.querySelector('a');
-      highlightLink(linkA, CONFIG.colors.hotPost, 'bold', 'underline');
+      linkA.classList.add('hnx-very-hot');
       addIcon(linkA, '🔥🔥🔥 ');
       break;
     }
     case (score >= scoreThresholdMedium): {
       const linkA = titlelineElement.querySelector('a');
-      highlightLink(linkA, CONFIG.colors.hotPost, 'bold');
+      linkA.classList.add('hnx-hot');
       addIcon(linkA, '🔥🔥 ');
       break;
     }
     case (score >= scoreThresholdLow): {
       const linkA = titlelineElement.querySelector('a');
-      highlightLink(linkA, CONFIG.colors.hotPost);
+      linkA.classList.add('hnx-hot');
       addIcon(linkA, '🔥 ');
       break;
     }
