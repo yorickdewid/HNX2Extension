@@ -109,16 +109,10 @@ const onTitleLine = (titlelineElement, title, url, score, comments) => {
   }
 }
 
-// const keywords = ['Crypto', 'ESP32', 'Wi-Fi', 'Arduino', 'Raspberry Pi', 'LLVM', 'Dutch', 'Netherlands', 'USB'];
-// chrome.storage.sync.set({ 'keywords': keywords });
-
-// const urls = ['https://media.ccc.de/*'];
-// chrome.storage.sync.set({ 'urls': urls });
-
 // TOOD: Limit the number or keywords and urls that can be stored.
 chrome.storage.sync.get(['keywords', 'urls'], function (result) {
-  matchKeywords = result.keywords;
-  matchUrls = result.urls;
+  matchKeywords = result.keywords || [];
+  matchUrls = result.urls || [];
 
   document.querySelectorAll('.titleline').forEach(titlelineElement => {
     parseTitleLineElement(titlelineElement, onTitleLine);
