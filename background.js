@@ -1,11 +1,19 @@
-const refreshInterval = 3 * 60 * 1000;
+const DEFAULT_CONFIG = {
+  score: {
+    high: 1000,
+    medium: 600,
+    low: 400
+  },
+  comments: {
+    high: 500,
+    medium: 200
+  },
+  keywords: [],
+  urls: []
+};
 
-function reloadActiveTab() {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs.length > 0) {
-      chrome.tabs.update(tabs[0].id, { url: tabs[0].url });
-    }
-  });
-}
-
-// setInterval(reloadActiveTab, refreshInterval);
+chrome.runtime.onInstalled.addListener(({ reason }) => {
+  if (reason === 'install') {
+    chrome.storage.sync.set(DEFAULT_CONFIG);
+  }
+});
